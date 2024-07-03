@@ -1,0 +1,34 @@
+name: Build and Analyze
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build with Maven
+      run: mvn clean install
+
+    - name: Run unit tests and generate coverage report
+      run: mvn test jacoco:report
+
+    - name: SonarQube Scan
+      run: mvn sonar:sonar -Dsonar.projectKey=java-reachability-play_java-reachability-play -Dsonar.host.url=http://3.88.181.110:9000 -Dsonar.login=squ_01308039ba8b587bef183aa0978f35b013ab5cb2
+
+    # - name: SonarQube Quality Gate check
+    #   uses: sonarsource/sonarqube-quality-gate-action@master
+    #   with:
+    #      scanMetadataReportFile: target/sonar/report-task.txt
+    #   env:
+    #     SONAR_TOKEN: squ_01308039ba8b587bef183aa0978f35b013ab5cb2
